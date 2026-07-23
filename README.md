@@ -2,8 +2,8 @@
   <p align=center> MERIT: Mutation-Exposed Weakness Ranking for Iterative Testing With Open-Source Code Large Language Models </p>
 <div align="center">
 
-![Python 3.10](https://img.shields.io/badge/python-3.10-g)
-![Java 11](https://img.shields.io/badge/java-11-blue.svg)
+![Java 11](https://img.shields.io/badge/java-11-g)
+![PIT 1.15.3](https://img.shields.io/badge/PIT-1.15.3-blue.svg)
 [![docs](https://img.shields.io/badge/docs-latest-blue)](README.md)
 
 </div>
@@ -122,38 +122,40 @@
    pip install -e .
    ```
 
-- Note: JDK 11 and Maven must be on PATH to match the EvoSuite runtime. JUnit 4.13.2, JaCoCo 0.8.11, PIT 1.15.3, and EvoSuite 1.2.0 are pinned in the build files and resolved on the first run. The backbone is served locally through vLLM, so no request leaves the premises.
+- Note: JDK 11 and Maven must be on PATH, matching the runtime of the test forks and of EvoSuite. JUnit 4.13.2, JaCoCo 0.8.11, PIT 1.15.3, and EvoSuite 1.2.0 are pinned in the build files and resolved on the first run. The backbone is served locally through a vLLM OpenAI-compatible server on a single GPU, so no request leaves the premises.
 
 ## Generation and Evaluation 
 
 1. Serving
 
    ```shell
-   python tools/serve.py
+   vllm serve Qwen/Qwen2.5-Coder-32B-Instruct --port 8000
    ```
 
 
-2. Generation
+2. Smoke test
 
    ```shell
-   python tools/generate.py
+   python run_experiments.py --smoke
    ```
 
 
 
-3. Evaluation
+3. Full run
 
    ```shell
-   python tools/eval.py
+   python run_experiments.py --benchmark humaneval_java --backbone qwen
+   python run_experiments.py --benchmark leetcode_java --backbone qwen
    ```
 
-4. Ablation
+4. Tables and figures
 
    ```shell
-   python tools/ablate.py
+   python generate_paper_results.py
    ```
 
-- Note: Each script includes detailed instructions on how to set parameters and use the script properly. The loop defaults to at most four weakness rounds, a budget of eight weakness items per prompt, and at most six new tests per round.
+- Note: Each script includes detailed instructions on how to set parameters and use the script properly. Always run the smoke test on a small sample before launching a full run.
+- The loop defaults to at most four weakness rounds, a budget of eight weakness items per prompt, and at most six new tests per round. Every table in the paper is produced from the run records by the last script alone.
 
 
 ## Code  
